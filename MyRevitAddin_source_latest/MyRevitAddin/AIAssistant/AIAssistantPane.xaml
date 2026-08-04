@@ -1,0 +1,258 @@
+<UserControl x:Class="MyRevitAddin.AIAssistant.AIAssistantPane"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="700" d:DesignWidth="380"
+             MinWidth="280" MinHeight="300"
+             Background="White">
+    <UserControl.Resources>
+        <!-- 发送按钮 -->
+        <Style x:Key="PrimaryButton" TargetType="Button">
+            <Setter Property="Background" Value="#0078D4"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="14,6"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="3" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#106EBE"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- 次要按钮 -->
+        <Style x:Key="SecondaryButton" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#666"/>
+            <Setter Property="BorderBrush" Value="#CCC"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Padding" Value="8,3"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- 顶部标题栏 -->
+        <Border Grid.Row="0" Background="#0078D4" Padding="12,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Orientation="Vertical">
+                    <TextBlock Text="AI 助手"
+                               Foreground="White" FontSize="15" FontWeight="Bold"/>
+                    <TextBlock x:Name="TxtConnStatus"
+                               Text="● 未连接"
+                               Foreground="#FFD700" FontSize="11"
+                               Margin="0,2,0,0"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button x:Name="BtnSettings" Content="⚙ 设置"
+                            Style="{StaticResource SecondaryButton}"
+                            Foreground="White" BorderBrush="White"
+                            Margin="0,0,4,0"
+                            Click="BtnSettings_Click"/>
+                    <Button x:Name="BtnTestConn" Content="测试连接"
+                            Style="{StaticResource SecondaryButton}"
+                            Foreground="White" BorderBrush="White"
+                            Margin="0,0,4,0"
+                            Click="BtnTestConn_Click"/>
+                    <Button x:Name="BtnClear" Content="清空"
+                            Style="{StaticResource SecondaryButton}"
+                            Foreground="White" BorderBrush="White"
+                            Click="BtnClear_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- 调试工具栏 -->
+        <Border Grid.Row="1" Background="#FFF8E1" BorderBrush="#FFC107"
+                BorderThickness="0,0,0,1" Padding="10,6">
+            <StackPanel>
+                <!-- 第一行：开关 + 记忆按钮 -->
+                <Grid Margin="0,0,0,4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <CheckBox x:Name="ChkDebugMode"
+                              Grid.Column="0"
+                              Content="🔍 调试模式（显示全链路原始数据）"
+                              VerticalAlignment="Center"
+                              FontSize="11"
+                              Foreground="#5D4037"
+                              Checked="ChkDebugMode_Changed"
+                              Unchecked="ChkDebugMode_Changed"/>
+                    <StackPanel Grid.Column="2" Orientation="Horizontal">
+                        <Button x:Name="BtnRecordWorkflow"
+                                Content="💾 记录工作流"
+                                FontSize="11"
+                                Padding="8,3"
+                                Background="#FFF8E1"
+                                BorderBrush="#FBC02D"
+                                Foreground="#F57F17"
+                                Margin="0,0,4,0"
+                                Click="BtnRecordWorkflow_Click"/>
+                        <Button x:Name="BtnImportMemory"
+                                Content="📚 导入规则/资料"
+                                FontSize="11"
+                                Padding="8,3"
+                                Background="#FFF8E1"
+                                BorderBrush="#FBC02D"
+                                Foreground="#F57F17"
+                                Margin="0,0,4,0"
+                                Click="BtnImportMemory_Click"/>
+                        <Button x:Name="BtnMemoryOverview"
+                                Content="📖 记忆总览"
+                                FontSize="11"
+                                Padding="8,3"
+                                Background="#FFF8E1"
+                                BorderBrush="#FBC02D"
+                                Foreground="#F57F17"
+                                Margin="0,0,4,0"
+                                Click="BtnMemoryOverview_Click"/>
+                        <Button x:Name="BtnManualTool"
+                                Content="🛠 手动调用工具"
+                                Style="{StaticResource SecondaryButton}"
+                                Background="#FFF3E0"
+                                BorderBrush="#FF9800"
+                                Foreground="#E65100"
+                                Click="BtnManualTool_Click"/>
+                    </StackPanel>
+                </Grid>
+                <!-- 第二行：文档状态 -->
+                <TextBlock x:Name="TxtDocStatus"
+                           Text="📄 当前文档：未加载"
+                           FontSize="11"
+                           Foreground="#795548"
+                           TextTrimming="CharacterEllipsis"/>
+            </StackPanel>
+        </Border>
+
+        <!-- 设置面板（默认折叠） -->
+        <Border Grid.Row="2" x:Name="PanelSettings" Background="#F0F4F8"
+                BorderBrush="#DDD" BorderThickness="0,0,0,1"
+                Padding="10,8" Visibility="Collapsed">
+            <StackPanel>
+                <Grid Margin="0,0,0,4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="72"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="模型" VerticalAlignment="Center" FontSize="12"/>
+                    <ComboBox Grid.Column="1" x:Name="CmbModel"
+                              FontSize="12" Padding="4" IsEditable="True"
+                              SelectionChanged="CmbModel_SelectionChanged"/>
+                </Grid>
+                <Grid Margin="0,0,0,4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="72"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="端点" VerticalAlignment="Center" FontSize="12"/>
+                    <TextBox Grid.Column="1" x:Name="TxtEndpoint"
+                             FontSize="11" Padding="4" VerticalContentAlignment="Center"
+                             TextChanged="TxtEndpoint_TextChanged"/>
+                </Grid>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="72"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="API Key" VerticalAlignment="Center" FontSize="12"/>
+                    <TextBox Grid.Column="1" x:Name="TxtApiKey"
+                             FontSize="11" Padding="4" VerticalContentAlignment="Center"
+                             TextChanged="TxtApiKey_TextChanged"/>
+                </Grid>
+                <TextBlock FontSize="10" Foreground="#888" Margin="4,4,4,0"
+                           TextWrapping="Wrap">
+提示：DashScope Key 格式为 sk-xxxxx（48+ 位十六进制，无点号）；阿里云百炼 MAAS Key 格式为 sk-ws-xxx。
+如出现 HTTP 401，请到 https://dashscope.console.aliyun.com/ 或百炼控制台重新生成有效 Key。
+                </TextBlock>
+            </StackPanel>
+        </Border>
+
+        <!-- 聊天记录区 -->
+        <RichTextBox Grid.Row="4" x:Name="TxtChat"
+                     IsReadOnly="True" 
+                     FontSize="14" 
+                     FontFamily="Microsoft YaHei UI"
+                     VerticalScrollBarVisibility="Auto"
+                     BorderThickness="0"
+                     Padding="10,8"
+                     Background="White"
+                     IsDocumentEnabled="True"/>
+
+        <!-- 输入区 -->
+        <Border Grid.Row="5" Background="#F8F8F8"
+                BorderBrush="#DDD" BorderThickness="0,1,0,0" 
+                Padding="8,6,8,8">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBox Grid.Row="0" Grid.Column="0" 
+                         x:Name="TxtInput" 
+                         FontSize="14"
+                         FontFamily="Microsoft YaHei UI"
+                         Padding="8"
+                         MinHeight="55"
+                         MaxHeight="140"
+                         TextWrapping="Wrap"
+                         AcceptsReturn="True"
+                         VerticalScrollBarVisibility="Auto"
+                         VerticalContentAlignment="Top"
+                         BorderBrush="#CCC"
+                         BorderThickness="1"
+                         KeyDown="TxtInput_KeyDown"/>
+
+                <Button Grid.Row="0" Grid.Column="1" 
+                        x:Name="BtnSend" 
+                        Content="发送" 
+                        Style="{StaticResource PrimaryButton}"
+                        Margin="6,0,0,0"
+                        MinWidth="60"
+                        Click="BtnSend_Click"/>
+
+                <TextBlock Grid.Row="1" Grid.ColumnSpan="2" 
+                           x:Name="TxtHint" 
+                           Text="Enter 发送 / Shift+Enter 换行 · AI 会自动搜索本地记忆中的类似操作"
+                           FontSize="11" 
+                           Foreground="#999"
+                           Margin="2,6,0,0"/>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

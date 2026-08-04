@@ -1,0 +1,144 @@
+<Window x:Class="MyRevitAddin.AIAssistant.ManualToolDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="🛠 手动调用 Revit 工具"
+        Height="620" Width="640"
+        WindowStartupLocation="CenterOwner"
+        Background="White"
+        ResizeMode="CanResize">
+    <Window.Resources>
+        <Style x:Key="TplBtn" TargetType="Button">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Padding" Value="8,2"/>
+            <Setter Property="Margin" Value="4,0,0,0"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#CCC"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+    </Window.Resources>
+    <Grid Margin="14">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- 工具选择 -->
+        <GroupBox Grid.Row="0" Header="① 选择工具" Padding="8" Margin="0,0,0,8">
+            <StackPanel>
+                <Grid Margin="0,0,0,4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <ComboBox x:Name="CmbTools"
+                              Grid.Column="0"
+                              FontSize="13"
+                              SelectionChanged="CmbTools_SelectionChanged"/>
+                    <TextBlock Grid.Column="1"
+                               x:Name="TxtToolDesc"
+                               FontSize="11"
+                               Foreground="#555"
+                               VerticalAlignment="Center"
+                               Margin="8,0,0,0"
+                               TextWrapping="Wrap"
+                               Width="260"/>
+                </Grid>
+            </StackPanel>
+        </GroupBox>
+
+        <!-- 参数输入 -->
+        <GroupBox Grid.Row="1" Header="② 参数 (JSON 格式，不传参数可留空或写 {} )" Padding="8" Margin="0,0,0,8">
+            <StackPanel>
+                <TextBox x:Name="TxtArgs"
+                         FontFamily="Consolas"
+                         FontSize="12"
+                         AcceptsReturn="True"
+                         AcceptsTab="True"
+                         TextWrapping="Wrap"
+                         VerticalScrollBarVisibility="Auto"
+                         MinHeight="80"
+                         MaxHeight="120"
+                         Text="{}"/>
+                <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                    <TextBlock FontSize="11" Foreground="#666" VerticalAlignment="Center" Text="快捷参数模板："/>
+                    <Button Content="视图-全部" Style="{StaticResource TplBtn}" Click="Tpl_ViewsAll"/>
+                    <Button Content="视图-平面" Style="{StaticResource TplBtn}" Click="Tpl_ViewsFloor"/>
+                    <Button Content="选类别-门" Style="{StaticResource TplBtn}" Click="Tpl_SelectDoor"/>
+                    <Button Content="清空" Style="{StaticResource TplBtn}" Click="Tpl_Clear"/>
+                </StackPanel>
+            </StackPanel>
+        </GroupBox>
+
+        <!-- 结果显示 -->
+        <GroupBox Grid.Row="3" Header="③ 工具执行原始返回 JSON (供调试校准)" Padding="8" Margin="0,0,0,8">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <RichTextBox x:Name="TxtResult"
+                             Grid.Row="0"
+                             IsReadOnly="True"
+                             FontFamily="Consolas"
+                             FontSize="12"
+                             VerticalScrollBarVisibility="Auto"
+                             Background="#F8F8F8"
+                             Padding="6"/>
+                <Grid Grid.Row="1" Margin="0,4,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock x:Name="TxtResultInfo"
+                               Grid.Column="0"
+                               FontSize="11"
+                               Foreground="#666"
+                               VerticalAlignment="Center"/>
+                    <Button Grid.Column="1"
+                            x:Name="BtnCopyResult"
+                            Content="📋 复制结果"
+                            FontSize="11"
+                            Padding="10,3"
+                            Click="BtnCopyResult_Click"/>
+                </Grid>
+            </Grid>
+        </GroupBox>
+
+        <!-- 按钮栏 -->
+        <Border Grid.Row="4" Background="#F0F4F8" Padding="10,8" BorderBrush="#DDD" BorderThickness="0,1,0,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0"
+                           x:Name="TxtTip"
+                           FontSize="11"
+                           Foreground="#666"
+                           VerticalAlignment="Center"
+                           Text="直接执行工具，不经过 AI。用于验证接口返回的真实数据是否正确。"/>
+                <Button Grid.Column="1"
+                        x:Name="BtnRun"
+                        Content="▶ 执行工具"
+                        Background="#0078D4"
+                        Foreground="White"
+                        BorderThickness="0"
+                        FontWeight="SemiBold"
+                        Padding="18,7"
+                        Margin="0,0,6,0"
+                        Click="BtnRun_Click"/>
+                <Button Grid.Column="2"
+                        x:Name="BtnOk"
+                        Content="确定 (使用结果)"
+                        Padding="18,7"
+                        IsEnabled="False"
+                        Click="BtnOk_Click"/>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
