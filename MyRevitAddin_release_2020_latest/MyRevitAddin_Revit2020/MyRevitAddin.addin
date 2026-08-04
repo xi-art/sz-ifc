@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<RevitAddIns>
+  <AddIn Type="Application">
+    <Name>MyRevitAddin</Name>
+    <Assembly>F:\vs\code\MyRevitAddin\bin\Debug\MyRevitAddin.dll</Assembly>
+    <FullClassName>MyRevitAddin.App</FullClassName>
+    <ClientId>41C5AEE7-36B4-4FE1-919D-22D3D9DFF776</ClientId>
+    <VendorId>MyRevitAddin</VendorId>
+    <VendorDescription>Revit 二次开发测试插件</VendorDescription>
+  </AddIn>
+</RevitAddIns>
